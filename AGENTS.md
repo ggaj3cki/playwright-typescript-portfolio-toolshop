@@ -4,12 +4,11 @@ QA automation portfolio: Playwright Test + TypeScript.
 SUT: Practice Software Testing – Toolshop (Sprint 5), https://practicesoftwaretesting.com/ — a public, shared instance.
 
 ## Commands
-<!-- TODO: align with package.json scripts -->
 - Install: `npm ci`
 - All tests: `npx playwright test`
 - Single spec: `npx playwright test <path/to/spec.ts> --project=<project>`
 - By tag: `npx playwright test --grep @smoke`
-- Lint / format / types: `npm run lint` · `npm run format` · `npx tsc --noEmit`
+- Lint / format / types: `npm run lint` · `npm run format` · `npm run format:check` · `npm run typecheck`
 - Report: `npx playwright show-report`
 
 ## Project layout
