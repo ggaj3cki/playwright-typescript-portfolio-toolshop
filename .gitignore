@@ -4,6 +4,7 @@ node_modules/
 # Playwright outputs
 playwright-report/
 test-results/
+.playwright-mcp/
 blob-report/
 playwright/.cache/
 coverage/
