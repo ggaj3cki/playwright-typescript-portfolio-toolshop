@@ -1,0 +1,19 @@
+{
+  "name": "playwright-typescript-portfolio-toolshop",
+  "version": "1.0.0",
+  "description": "A QA automation portfolio focused on the [Toolshop](https://practicesoftwaretesting.com/) e-commerce application, using Playwright and TypeScript.",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git-main:ggaj3cki/playwright-typescript-portfolio-toolshop"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.6"
+  }
+}

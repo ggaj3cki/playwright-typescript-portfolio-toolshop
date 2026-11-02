@@ -1,0 +1,9 @@
+# Repository-local Codex settings (loaded for trusted projects).
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Playwright browser tools for Codex in this repository only.
+# Node.js/npm must be installed before the MCP server can start.
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@latest", "--isolated"]
