@@ -21,4 +21,16 @@ export class HomePage {
     await this.page.getByTestId('search-query').fill(query);
     await this.page.getByTestId('search-submit').click();
   }
+
+  categoryCheckbox(categoryName: string): Locator {
+    return this.page.getByRole('checkbox', { name: categoryName, exact: true });
+  }
+
+  async filterByCategory(categoryName: string): Promise<void> {
+    await this.categoryCheckbox(categoryName).check();
+  }
+
+  async openFirstProduct(): Promise<void> {
+    await this.productNames.first().click();
+  }
 }
