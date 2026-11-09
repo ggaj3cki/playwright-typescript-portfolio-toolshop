@@ -1,8 +1,12 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import type { LoginCredentials } from '../data/loginCredentials';
 
 export class LoginPage {
-  constructor(private readonly page: Page) {}
+  readonly loginError: Locator;
+
+  constructor(private readonly page: Page) {
+    this.loginError = page.getByTestId('login-error');
+  }
 
   async goto(): Promise<void> {
     await this.page.goto('/auth/login');
