@@ -2,9 +2,13 @@ import type { Locator, Page } from '@playwright/test';
 import type { LoginCredentials } from '../data/loginCredentials';
 
 export class LoginPage {
+  readonly emailError: Locator;
+  readonly passwordError: Locator;
   readonly loginError: Locator;
 
   constructor(private readonly page: Page) {
+    this.emailError = page.getByTestId('email-error');
+    this.passwordError = page.getByTestId('password-error');
     this.loginError = page.getByTestId('login-error');
   }
 

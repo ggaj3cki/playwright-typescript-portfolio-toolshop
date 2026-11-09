@@ -27,6 +27,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Local test planning
+/docs/test-checklist.md
+
 # Playwright
 /playwright-report/
 /blob-report/
