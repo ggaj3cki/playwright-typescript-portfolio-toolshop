@@ -28,7 +28,7 @@ Thumbs.db
 .idea/
 
 # Local test planning
-/docs/test-checklist.md
+docs-local/
 
 # Playwright
 /playwright-report/

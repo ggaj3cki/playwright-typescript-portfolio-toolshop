@@ -26,7 +26,7 @@ SUT: Practice Software Testing – Toolshop (Sprint 5), https://practicesoftware
 - Auth: log in via API in setup and reuse `storageState`. UI login only in login tests.
 - Each test creates the data it needs; no dependence on other tests, order, or pre-existing records.
 - `test.step()` names describe business actions ("Add product to cart"), not clicks.
-- Tags: `@smoke`, `@regression`, `@api` <!-- TODO: confirm tag set -->
+- Tags: `@smoke`, `@regression`, `@api`, `@ui`, `@e2e`
 
 ## Don't
 - Don't use `waitForTimeout`, raise global timeouts, or add `retries` to hide flakiness — find the root cause.
@@ -39,7 +39,9 @@ SUT: Practice Software Testing – Toolshop (Sprint 5), https://practicesoftware
 - The instance is shared: use synthetic data, avoid bulk or load-like request loops, don't modify the default seeded accounts.
 
 ## Known app quirks
-<!-- TODO: add real gotchas as you hit them (e.g. data resets, slow endpoints, intentional bugs) -->
+- The product catalog is seeded and effectively read-only for tests. Tests read it and derive expectations dynamically (no hardcoded product lists or IDs). This is a deliberate exception to "each test creates the data it needs".
+- The public instance may show a security (Cloudflare) challenge. If it or an outage blocks verification, stop and report instead of assuming behavior.
+- Wrong-password scenarios use synthetic, non-existent accounts only, to avoid risking lockout of seeded accounts.
 
 ## Done means
 - Specs touched by the change pass locally; new tests pass with `--repeat-each=3`.

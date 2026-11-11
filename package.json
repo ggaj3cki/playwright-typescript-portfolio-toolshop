@@ -2,7 +2,6 @@
   "name": "playwright-typescript-portfolio-toolshop",
   "version": "1.0.0",
   "description": "A QA automation portfolio focused on the [Toolshop](https://practicesoftwaretesting.com/) e-commerce application, using Playwright and TypeScript.",
-  "main": "index.js",
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,mjs,json}\"",
@@ -11,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git-main:ggaj3cki/playwright-typescript-portfolio-toolshop"
+    "url": "git+https://github.com/ggaj3cki/playwright-typescript-portfolio-toolshop.git"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +23,7 @@
     "@types/node": "^26.6.6",
     "eslint": "^10.14.0",
     "prettier": "^3.9.10",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1"
   }
 }
