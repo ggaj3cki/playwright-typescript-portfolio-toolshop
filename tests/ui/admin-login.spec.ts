@@ -3,7 +3,7 @@ import { validLoginCredentials } from '../../src/data/loginCredentials';
 import { AdminDashboardPage } from '../../src/pages/AdminDashboardPage';
 import { LoginPage } from '../../src/pages/LoginPage';
 
-test('admin can log in @smoke', async ({ page }) => {
+test('admin can log in @smoke @ui', async ({ page }) => {
   const loginPage = new LoginPage(page);
   const adminDashboardPage = new AdminDashboardPage(page);
 

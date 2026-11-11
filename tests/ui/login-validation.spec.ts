@@ -8,7 +8,7 @@ for (const {
   errorField,
   expectedError,
 } of loginValidationCases) {
-  test(`login ${title} @regression`, async ({ page }) => {
+  test(`login ${title} @regression @ui`, async ({ page }) => {
     const loginPage = new LoginPage(page);
 
     await test.step('Submit login details', async () => {

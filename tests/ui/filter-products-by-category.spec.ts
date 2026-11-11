@@ -33,9 +33,19 @@ test('restores the first page after removing the category filter @regression @ui
     .map((name) => name.trim())
     .sort();
 
-  await test.step('Apply and remove the category filter', async () => {
+  await test.step('Apply the category filter', async () => {
     await homePage.filterByCategory(categoryName);
     await expect(homePage.categoryCheckbox(categoryName)).toBeChecked();
+  });
+
+  await test.step('See a changed product set for the selected category', async () => {
+    const filteredProductNames = (await homePage.productNames.allTextContents())
+      .map((name) => name.trim())
+      .sort();
+    expect(filteredProductNames).not.toEqual(initialProductNames);
+  });
+
+  await test.step('Remove the category filter', async () => {
     await homePage.removeCategoryFilter(categoryName);
   });
 

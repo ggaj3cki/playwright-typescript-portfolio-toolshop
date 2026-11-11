@@ -2,6 +2,13 @@ import { expect, test } from '@playwright/test';
 import { productSearchData } from '../../src/data/productSearchData';
 import { HomePage } from '../../src/pages/HomePage';
 
+function expectRelevantProductNames(names: string[], searchTerm: string): void {
+  const irrelevant = names.filter(
+    (name) => !name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+  expect(irrelevant).toEqual([]);
+}
+
 test('finds a product by its full name on the first page @regression @ui', async ({
   page,
 }) => {
@@ -17,20 +24,11 @@ test('finds a product by its full name on the first page @regression @ui', async
     await expect(homePage.searchCaption).toHaveText(
       `Searched for: ${productName}`,
     );
-    await expect
-      .poll(async () =>
-        (await homePage.productNames.allTextContents()).map((name) =>
-          name.trim(),
-        ),
-      )
-      .toContain(productName);
-    await expect
-      .poll(async () =>
-        (await homePage.productNames.allTextContents()).every((name) =>
-          name.toLowerCase().includes(productName.toLowerCase()),
-        ),
-      )
-      .toBe(true);
+    const names = (await homePage.productNames.allTextContents()).map((name) =>
+      name.trim(),
+    );
+    expect(names).toContain(productName);
+    expectRelevantProductNames(names, productName);
   });
 });
 
@@ -49,13 +47,10 @@ test('finds products by a general keyword on the first page @regression @ui', as
       `Searched for: ${productSearchData.keyword}`,
     );
     await expect(homePage.productNames.first()).toBeVisible();
-    await expect
-      .poll(async () =>
-        (await homePage.productNames.allTextContents()).every((name) =>
-          name.toLowerCase().includes(productSearchData.keyword.toLowerCase()),
-        ),
-      )
-      .toBe(true);
+    const names = (await homePage.productNames.allTextContents()).map((name) =>
+      name.trim(),
+    );
+    expectRelevantProductNames(names, productSearchData.keyword);
   });
 });
 

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { createInvalidLoginCredentials } from '../../src/data/invalidLoginCredentials';
 import { LoginPage } from '../../src/pages/LoginPage';
 
-test('user cannot log in with invalid credentials @regression', async ({
+test('user cannot log in with invalid credentials @regression @ui', async ({
   page,
 }) => {
   const loginPage = new LoginPage(page);
