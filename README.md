@@ -92,10 +92,16 @@ Run all configured tests:
 npx playwright test
 ```
 
-Run tests using Chromium:
+Run browser tests (UI and E2E) using Chromium:
 
 ```bash
 npx playwright test --project=chromium
+```
+
+Run API tests (no browser required):
+
+```bash
+npx playwright test --project=api
 ```
 
 Run tests with the browser visible:
