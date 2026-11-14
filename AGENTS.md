@@ -44,6 +44,7 @@ API: https://api.practicesoftwaretesting.com — the stable instance without the
 - The product catalog is seeded and effectively read-only for tests. Tests read it and derive expectations dynamically (no hardcoded product lists or IDs). This is a deliberate exception to "each test creates the data it needs".
 - The public instance may show a security (Cloudflare) challenge. If it or an outage blocks verification, stop and report instead of assuming behavior.
 - Wrong-password scenarios use synthetic, non-existent accounts only, to avoid risking lockout of seeded accounts.
+- API: Toolshop API 5.0.0 (Swagger), verified 12.11.2026 against Sprint 5. `by_category` takes a leaf category id; a parent id returns an empty list. Search is case-insensitive and name-based (a keyword present only in a description returns no results). `/products` accepts GET and QUERY.
 
 ## Done means
 - Specs touched by the change pass locally; new tests pass with `--repeat-each=3`.

@@ -44,6 +44,33 @@ test('finds products by name on the first page @regression @api', async ({
   });
 });
 
+test('finds a catalog product by its full name on the first page @regression @api', async ({
+  request,
+}) => {
+  const productsApi = new ProductsApi(request);
+
+  const source = await test.step('Choose a catalog product', () =>
+    sourceProduct(productsApi));
+
+  await test.step('Find the product by its full name', async () => {
+    const page = await readFirstPage(
+      await productsApi.searchProducts(source.name),
+    );
+    expect(
+      page.total,
+      'full-name matches do not fit on the first page',
+    ).toBeLessThanOrEqual(page.per_page);
+    expect(page.data.map(({ id }) => id)).toContain(source.id);
+    expect(
+      page.data
+        .map(({ name }) => name)
+        .filter(
+          (name) => !name.toLowerCase().includes(source.name.toLowerCase()),
+        ),
+    ).toEqual([]);
+  });
+});
+
 test('returns an empty first page for an unmatched name @regression @api', async ({
   request,
 }) => {
@@ -79,6 +106,7 @@ test('filters the first page by a product category @regression @api', async ({
         .filter(({ category }) => category.id !== source.category.id)
         .map(({ category }) => category.id),
     ).toEqual([]);
+    // Verify recall only when all filtered products fit on page one; otherwise verify precision only.
     if (page.total <= page.per_page) {
       expect(page.data.map(({ id }) => id)).toContain(source.id);
     }
@@ -103,32 +131,47 @@ test('filters the first page by a product brand @regression @api', async ({
         .filter(({ brand }) => brand.id !== source.brand.id)
         .map(({ brand }) => brand.id),
     ).toEqual([]);
+    // Verify recall only when all filtered products fit on page one; otherwise verify precision only.
     if (page.total <= page.per_page) {
       expect(page.data.map(({ id }) => id)).toContain(source.id);
     }
   });
 });
 
-test('sorts the first page by price in both directions @regression @api', async ({
+test('sorts prices across the catalog in both directions @regression @api', async ({
   request,
 }) => {
   const productsApi = new ProductsApi(request);
 
-  await test.step('See prices from lowest to highest', async () => {
-    const page = await readFirstPage(
-      await productsApi.listProducts(1, { sort: 'price,asc' }),
-    );
-    const prices = page.data.map(({ price }) => price);
-    expect(new Set(prices).size).toBeGreaterThan(1);
-    expect(prices).toEqual([...prices].sort((a, b) => a - b));
-  });
+  const ascending =
+    await test.step('See prices from lowest to highest', async () => {
+      const page = await readFirstPage(
+        await productsApi.listProducts(1, { sort: 'price,asc' }),
+      );
+      const prices = page.data.map(({ price }) => price);
+      expect(new Set(prices).size).toBeGreaterThan(1);
+      expect(prices).toEqual([...prices].sort((a, b) => a - b));
+      return { page, prices };
+    });
 
-  await test.step('See prices from highest to lowest', async () => {
-    const page = await readFirstPage(
-      await productsApi.listProducts(1, { sort: 'price,desc' }),
+  const descending =
+    await test.step('See prices from highest to lowest', async () => {
+      const page = await readFirstPage(
+        await productsApi.listProducts(1, { sort: 'price,desc' }),
+      );
+      const prices = page.data.map(({ price }) => price);
+      expect(new Set(prices).size).toBeGreaterThan(1);
+      expect(prices).toEqual([...prices].sort((a, b) => b - a));
+      return { page, prices };
+    });
+
+  await test.step('Verify price order across the catalog', () => {
+    expect(
+      ascending.page.total,
+      'catalog too small to prove cross-page sorting',
+    ).toBeGreaterThanOrEqual(2 * ascending.page.per_page);
+    expect(Math.max(...ascending.prices)).toBeLessThanOrEqual(
+      Math.min(...descending.prices),
     );
-    const prices = page.data.map(({ price }) => price);
-    expect(new Set(prices).size).toBeGreaterThan(1);
-    expect(prices).toEqual([...prices].sort((a, b) => b - a));
   });
 });
