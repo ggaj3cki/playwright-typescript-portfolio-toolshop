@@ -2,12 +2,9 @@ import { expect, test } from '@playwright/test';
 import { CartPage } from '../../src/pages/CartPage';
 import { HomePage } from '../../src/pages/HomePage';
 import { ProductDetailsPage } from '../../src/pages/ProductDetailsPage';
+import { parsePriceInCents } from '../../src/utils/price';
 
-function priceInCents(text: string): number {
-  const match = /^\$?(\d+|\d{1,3}(?:,\d{3})+)\.(\d{2})$/.exec(text.trim());
-  if (!match) throw new Error(`Unexpected price format: ${text}`);
-  return Number(match[1].replaceAll(',', '')) * 100 + Number(match[2]);
-}
+const cartPricePattern = /^\$(?:\d+|\d{1,3}(?:,\d{3})+)\.\d{2}$/;
 
 test('adds a catalog product to the guest cart @smoke @ui', async ({
   page,
@@ -29,7 +26,9 @@ test('adds a catalog product to the guest cart @smoke @ui', async ({
       await expect(detailsPage.quantity).toHaveValue('1');
       return {
         name: (await detailsPage.name.innerText()).trim(),
-        unitPriceCents: priceInCents(await detailsPage.unitPrice.innerText()),
+        unitPriceCents: parsePriceInCents(
+          await detailsPage.unitPrice.innerText(),
+        ),
       };
     });
 
@@ -38,10 +37,10 @@ test('adds a catalog product to the guest cart @smoke @ui', async ({
   });
 
   await test.step('See the cart confirmation and item count', async () => {
-    await expect(cartPage.cartQuantity).toHaveText('1');
     await expect(detailsPage.addedAlert).toHaveText(
       'Product added to shopping cart.',
     );
+    await expect(cartPage.cartQuantity).toHaveText('1');
   });
 
   await test.step('See the product and correct totals in the cart', async () => {
@@ -50,11 +49,18 @@ test('adds a catalog product to the guest cart @smoke @ui', async ({
     await expect(cartPage.productName).toHaveText(product.name);
     await expect(cartPage.quantity).toHaveValue('1');
     const quantity = Number(await cartPage.quantity.inputValue());
-    expect(priceInCents(await cartPage.unitPrice.innerText())).toBe(
-      product.unitPriceCents,
-    );
-    const linePriceCents = priceInCents(await cartPage.linePrice.innerText());
-    expect(linePriceCents).toBe(product.unitPriceCents * quantity);
-    expect(priceInCents(await cartPage.total.innerText())).toBe(linePriceCents);
+    await expect(cartPage.unitPrice).toHaveText(cartPricePattern);
+    await expect
+      .poll(async () => parsePriceInCents(await cartPage.unitPrice.innerText()))
+      .toBe(product.unitPriceCents);
+    const expectedLinePriceCents = product.unitPriceCents * quantity;
+    await expect(cartPage.linePrice).toHaveText(cartPricePattern);
+    await expect
+      .poll(async () => parsePriceInCents(await cartPage.linePrice.innerText()))
+      .toBe(expectedLinePriceCents);
+    await expect(cartPage.total).toHaveText(cartPricePattern);
+    await expect
+      .poll(async () => parsePriceInCents(await cartPage.total.innerText()))
+      .toBe(expectedLinePriceCents);
   });
 });

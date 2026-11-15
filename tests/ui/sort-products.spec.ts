@@ -1,13 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { productSortData } from '../../src/data/productSortData';
 import { HomePage } from '../../src/pages/HomePage';
-
-function parsePrice(text: string): number {
-  if (!/^\$(?:\d+|\d{1,3}(?:,\d{3})+)\.\d{2}$/.test(text)) {
-    throw new Error(`Unexpected product price format: ${text}`);
-  }
-  return Number(text.slice(1).replaceAll(',', ''));
-}
+import { parsePriceInCents } from '../../src/utils/price';
 
 test('shows first-page products by ascending price @regression @ui', async ({
   page,
@@ -20,7 +14,9 @@ test('shows first-page products by ascending price @regression @ui', async ({
       names: (await homePage.productNames.allTextContents())
         .map((name) => name.trim())
         .sort(),
-      prices: (await homePage.productPrices.allTextContents()).map(parsePrice),
+      prices: (await homePage.productPrices.allTextContents()).map(
+        parsePriceInCents,
+      ),
     };
   });
 
@@ -33,7 +29,7 @@ test('shows first-page products by ascending price @regression @ui', async ({
       productSortData.ascendingPriceValue,
     );
     const prices = (await homePage.productPrices.allTextContents()).map(
-      parsePrice,
+      parsePriceInCents,
     );
     expect(prices.length).toBeGreaterThan(1);
     expect(new Set(prices).size).toBeGreaterThan(1);

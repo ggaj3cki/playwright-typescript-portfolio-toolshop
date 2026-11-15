@@ -20,6 +20,7 @@ API: https://api.practicesoftwaretesting.com — the stable instance without the
 - `src/api/` — API clients built on `APIRequestContext`
 - `src/fixtures/` — custom fixtures (auth state, API clients, page objects)
 - `src/data/` — test data builders; no hardcoded data in specs
+- `src/utils/` — pure, UI-agnostic helpers (e.g. price parsing); no locators, no Playwright objects
 - Env config in `.env` (gitignored); template in `.env.example`
 
 ## Conventions
