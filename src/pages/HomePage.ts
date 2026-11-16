@@ -27,6 +27,16 @@ export class HomePage {
     return (await this.productNames.first().innerText()).trim();
   }
 
+  async displayedProductIds(): Promise<string[]> {
+    return this.page
+      .getByTestId(/^product-[0-9A-Z]{26}$/)
+      .evaluateAll((cards) =>
+        cards.map((card) =>
+          (card.getAttribute('data-test') ?? '').slice('product-'.length),
+        ),
+      );
+  }
+
   async search(query: string): Promise<void> {
     await this.page.getByTestId('search-query').fill(query);
     const responsePromise = this.productsResponse('/products/search');
