@@ -1,6 +1,5 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
-
-const API_BASE_URL = 'https://api.practicesoftwaretesting.com';
+import { API_BASE_URL } from './apiBaseUrl';
 
 export interface Product {
   id: string;

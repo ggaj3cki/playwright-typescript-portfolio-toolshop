@@ -46,6 +46,9 @@ API: https://api.practicesoftwaretesting.com — the stable instance without the
 - The public instance may show a security (Cloudflare) challenge. If it or an outage blocks verification, stop and report instead of assuming behavior.
 - Wrong-password scenarios use synthetic, non-existent accounts only, to avoid risking lockout of seeded accounts.
 - API: Toolshop API 5.0.0 (Swagger), verified 12.11.2026 against Sprint 5. `by_category` takes a leaf category id; a parent id returns an empty list. Search is case-insensitive and name-based (a keyword present only in a description returns no results). `/products` accepts GET and QUERY.
+- Auth API: POST /users/login returns access_token, token_type: bearer and expires_in: 300; a failed login returns 401 with an error field, while GET /users/me without or with an invalid token returns 401 with a message field (different keys). No throttling signals were observed.
+- Seeded demo accounts are public and shared; a login can fail with 423 (locked) or a changed password because of other users. The credentials are public and the lockout was also observed in manual testing: treat a 423 as an environment limitation, not a product defect. Keep logins to the minimum (one per run) and never send wrong passwords for seeded accounts.
+- Cart API: add and update quantity validation depends on the `Accept` header — with `Accept: application/json` an out-of-range quantity (`0`, `100`, `-1`) returns 422 with `errors.quantity`; without it the API answers 302 with an HTML page. `PUT /carts/{id}/product/quantity` replaces the quantity and returns `result` (Swagger documents `success`). `DELETE /carts/{id}/product/{productId}` returns 204 (also for a product that is not in the cart); `DELETE /carts/{id}` returns 204. A cart read returns no line totals.
 
 ## Done means
 - Specs touched by the change pass locally; new tests pass with `--repeat-each=3`.
