@@ -1,21 +1,40 @@
 {
   "name": "playwright-typescript-portfolio-toolshop",
   "version": "1.0.0",
-  "description": "A QA automation portfolio focused on the [Toolshop](https://practicesoftwaretesting.com/) e-commerce application, using Playwright and TypeScript.",
+  "description": "QA automation portfolio: Playwright and TypeScript tests (UI, API, E2E) for the Practice Software Testing Toolshop.",
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,mjs,json}\"",
     "format:check": "prettier --check \"**/*.{ts,mjs,json}\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test --project=api --project=chromium",
+    "test:all": "playwright test",
+    "test:api": "playwright test --project=api",
+    "test:ui": "playwright test tests/ui --project=chromium",
+    "test:e2e": "playwright test tests/e2e --project=chromium",
+    "test:smoke": "playwright test --grep @smoke --project=api --project=chromium",
+    "report": "playwright show-report"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ggaj3cki/playwright-typescript-portfolio-toolshop.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "playwright",
+    "typescript",
+    "test-automation",
+    "qa",
+    "api-testing",
+    "e2e-testing",
+    "page-object-model"
+  ],
+  "author": "ggaj3cki",
   "license": "ISC",
+  "private": true,
   "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@faker-js/faker": "^10.6.0",

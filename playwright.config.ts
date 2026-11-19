@@ -7,13 +7,14 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  // AGENTS.md: fix flaky tests instead of retrying them.
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     testIdAttribute: 'data-test',
     baseURL: 'https://practicesoftwaretesting.com/',
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
   projects: [
     {
