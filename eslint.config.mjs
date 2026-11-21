@@ -96,11 +96,23 @@ export default defineConfig(
       'no-restricted-imports': [
         'error',
         {
+          paths: [
+            {
+              name: '../../src/fixtures',
+              message:
+                'AGENTS.md: UI specs cannot import combined fixtures; use catalogFixtures.',
+            },
+          ],
           patterns: [
             {
               group: ['**/src/api/**'],
               message:
                 'AGENTS.md: UI specs cannot import API clients; use the E2E layer.',
+            },
+            {
+              group: ['**/src/fixtures/apiFixtures', '**/src/fixtures/index'],
+              message:
+                'AGENTS.md: UI specs cannot import API or combined fixtures; use catalogFixtures.',
             },
           ],
         },
@@ -113,11 +125,25 @@ export default defineConfig(
       'no-restricted-imports': [
         'error',
         {
+          paths: [
+            {
+              name: '../../src/fixtures',
+              message:
+                'AGENTS.md: API specs cannot import combined fixtures; use apiFixtures.',
+            },
+          ],
           patterns: [
             {
-              group: ['**/src/pages/**', '**/src/fixtures/**'],
+              group: ['**/src/pages/**'],
+              message: 'AGENTS.md: API specs cannot import Page Objects.',
+            },
+            {
+              group: [
+                '**/src/fixtures/catalogFixtures',
+                '**/src/fixtures/index',
+              ],
               message:
-                'AGENTS.md: API specs cannot import Page Objects or UI fixtures.',
+                'AGENTS.md: API specs cannot import UI or combined fixtures; use apiFixtures.',
             },
           ],
         },

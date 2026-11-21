@@ -1,4 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
+import { waitForResponseTo } from './responseWaits';
 
 export class ProductDetailsPage {
   readonly categoryBadge: Locator;
@@ -26,10 +27,10 @@ export class ProductDetailsPage {
   }
 
   async addToCart(): Promise<string> {
-    const responsePromise = this.page.waitForResponse(
-      (response) =>
-        response.request().method() === 'POST' &&
-        /^\/carts\/[^/]+$/.test(new URL(response.url()).pathname),
+    const responsePromise = waitForResponseTo(
+      this.page,
+      'POST',
+      /^\/carts\/[^/]+$/,
     );
     await this.addToCartButton.click();
     const response = await responsePromise;

@@ -1,16 +1,10 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from '../../src/fixtures/apiFixtures';
 import { productApiData } from '../../src/data/productApiData';
-import {
-  ProductsApi,
-  type ProductDetails,
-  type ProductsPage,
-} from '../../src/api/ProductsApi';
+import type { ProductDetails, ProductsPage } from '../../src/api/ProductsApi';
 
 test('returns details consistent with the catalog @regression @api', async ({
-  request,
+  productsApi,
 }) => {
-  const productsApi = new ProductsApi(request);
-
   const source = await test.step('Find a product in the catalog', async () => {
     const response = await productsApi.listProducts(1);
     expect(response.status()).toBe(200);
@@ -35,9 +29,7 @@ test('returns details consistent with the catalog @regression @api', async ({
   });
 });
 
-test('reports a missing product @regression @api', async ({ request }) => {
-  const productsApi = new ProductsApi(request);
-
+test('reports a missing product @regression @api', async ({ productsApi }) => {
   await test.step('Request a non-existent product', async () => {
     const response = await productsApi.getProduct(
       productApiData.missingProductId,

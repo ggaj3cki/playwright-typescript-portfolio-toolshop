@@ -4,7 +4,7 @@ A QA Automation portfolio project focused on designing, implementing, and mainta
 
 The project uses a realistic e-commerce application to demonstrate test automation techniques, software testing principles, and maintainable test architecture.
 
-## Application Under Test
+## Application under test
 
 **Practice Software Testing — Toolshop (Sprint 5)**
 
@@ -14,7 +14,7 @@ Toolshop is a demo e-commerce application designed for software testing practice
 - **REST API:** https://api.practicesoftwaretesting.com/
 - **API Documentation:** https://api.practicesoftwaretesting.com/api/documentation
 
-## Technology Stack
+## Technology stack
 
 - **TypeScript** — programming language
 - **Playwright Test** — test automation framework
@@ -22,139 +22,76 @@ Toolshop is a demo e-commerce application designed for software testing practice
 - **GitHub Actions** — continuous integration
 - **Git / GitHub** — version control
 
-Additional tools and libraries may be introduced when justified by the project's requirements.
+## Test layers
 
-## Test Automation Scope
+| Layer | Coverage | Specs | Project |
+| --- | --- | --- | --- |
+| API | Catalog, search, authentication, and guest cart endpoints | [`tests/api/`](tests/api/) | `api` |
+| UI | Login, catalog browsing, and guest cart behavior | [`tests/ui/`](tests/ui/) | `chromium` |
+| E2E | UI behavior checked against independent API data | [`tests/e2e/`](tests/e2e/) | `chromium` |
 
-The portfolio focuses on three complementary testing layers.
+See [test coverage](docs/test-coverage.md) for each spec's checks and limits. Firefox and WebKit projects are configured; this document does not claim execution results for them.
 
-### UI Testing
+## Project structure
 
-Browser-based functional testing of the application, including authentication, product browsing, searching, filtering, sorting, shopping cart operations, and form validation.
-
-### API Testing
-
-REST API testing covering response validation, HTTP status codes, authentication, negative scenarios, and resource operations.
-
-### End-to-End Testing
-
-Business workflows combining multiple application features, including product discovery and shopping cart operations, verified against API data where the UI alone cannot prove correctness.
-
-The project also explores integration between UI and API testing, such as verifying what the UI displays against data retrieved independently from the API.
-
-## Test Architecture & Practices
-
-The project emphasizes:
-
-- Page Object Model (POM) where appropriate
-- Reusable Page Objects, centralized test data, and a small API client
-- Data-driven and parameterized testing
-- Test isolation and independent execution
-- Reliable locators and web-first assertions
-- Meaningful test steps and assertions
-- Positive and negative test scenarios
-- Synchronization on network responses and API response validation
-- Debugging using Playwright Trace Viewer
-- Automated reporting and continuous integration
-- Readable, maintainable, and scalable test code
-
-The architecture is intentionally kept simple. Abstractions are introduced when they provide practical benefits rather than unnecessary complexity.
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (a supported LTS version)
-- npm
-- Git
-
-### Installation
-
-Clone the repository and install dependencies:
-
-```bash
-git clone https://github.com/ggaj3cki/playwright-typescript-portfolio-toolshop.git
-cd playwright-typescript-portfolio-toolshop
-npm ci
+```text
+tests/api/       API endpoint specs
+tests/ui/        Browser interaction specs
+tests/e2e/       UI and API comparison specs
+src/api/         API request clients
+src/pages/       Page Objects and response-based waits
+src/fixtures/    API, catalog, and merged E2E fixtures
+src/data/        Test inputs and data builders
+src/utils/       Pure helpers, including price conversion
+docs/            Public test coverage documentation
 ```
 
-Install Playwright browsers:
+## Getting started
+
+Use Node.js 22 (see [`.nvmrc`](.nvmrc)) and npm. Install dependencies and Playwright browsers:
 
 ```bash
+npm ci
 npx playwright install
 ```
 
-### Running Tests
+The current tests do not require a `.env` file; [`.env.example`](.env.example) is a placeholder for future non-secret settings.
 
-Run all configured tests:
+| Command | Purpose |
+| --- | --- |
+| `npm test` | Run the `api` and `chromium` projects |
+| `npm run test:all` | Run every configured project, including Firefox and WebKit |
+| `npm run test:api` | Run API specs without a browser |
+| `npm run test:ui` | Run UI specs in Chromium |
+| `npm run test:e2e` | Run E2E specs in Chromium |
+| `npm run test:smoke` | Run `@smoke` tests in API and Chromium |
+| `npx playwright test tests/ui/sort-products.spec.ts --project=chromium` | Run one browser spec |
+| `npx playwright test tests/api/carts.spec.ts --project=api` | Run one API spec |
+| `npm run report` | Open the generated HTML report |
 
-```bash
-npx playwright test
-```
+The `api` project uses API requests without a browser. The `chromium` project runs UI and E2E specs. Playwright uses list output in the terminal and generates an HTML report without opening it automatically. Failed tests retain a trace and screenshot; open a trace with `npx playwright show-trace <trace.zip>`. No retries are configured.
 
-Run browser tests (UI and E2E) using Chromium:
+## Quality checks
 
-```bash
-npx playwright test --project=chromium
-```
+| Command | Check |
+| --- | --- |
+| `npm run lint` | ESLint and project rules |
+| `npm run typecheck` | TypeScript types without emitting files |
+| `npm run format:check` | Prettier for TypeScript, JavaScript modules, and JSON |
 
-Run API tests (no browser required):
+ESLint prevents focused tests, arbitrary time waits, `networkidle`, raw locators in UI/E2E specs, and imports across restricted test layers. It also keeps `src/utils/` independent of Playwright.
 
-```bash
-npx playwright test --project=api
-```
+## Continuous integration
 
-Run tests with the browser visible:
+The [`code-checks` workflow](.github/workflows/code-checks.yml) runs lint, type checking, and formatting checks on pushes and pull requests to `main` or `master`. Browser tests are excluded because the shared public site can present a security challenge to hosted runners. The [API workflow](.github/workflows/api-tests.yml) is manual and experimental; its GitHub execution result is not recorded in this repository.
 
-```bash
-npx playwright test --headed
-```
+## Test environment
 
-Open Playwright UI Mode:
+The suite targets the shared public Toolshop instance. The seeded product catalog is treated as read-only, and tests derive expected products from catalog responses. Negative authentication uses synthetic accounts; seeded demo accounts are never modified. A public demo account may return HTTP 423 or have changed credentials because other users share the instance; that is an environment limitation, not evidence of a product defect.
 
-```bash
-npx playwright test --ui
-```
+API cart specs create and delete their own guest carts. The E2E guest cart spec registers its cart created through the UI for API cleanup. UI cart specs create guest carts but do not delete the cart resource. No test places an order or completes checkout.
 
-Print results in the terminal without opening the HTML report:
-
-```bash
-npx playwright test --reporter=line
-```
-
-Collect traces for debugging (open them with `npx playwright show-trace`):
-
-```bash
-npx playwright test --trace on
-```
-
-### Test Reports
-
-Open the HTML test report after executing the tests:
-
-```bash
-npx playwright show-report
-```
-
-Playwright also provides diagnostic tools, including screenshots, traces, and execution logs.
-
-## Continuous Integration
-
-The repository includes a GitHub Actions workflow for code checks. It installs project dependencies and runs linting, TypeScript type checking, and Prettier formatting checks.
-
-Playwright browser tests run locally against the public Toolshop instance. They are not part of the CI workflow because the public site can show a Cloudflare security challenge to GitHub-hosted runners.
-
-## Test Environment
-
-The project primarily targets the publicly hosted Toolshop application.
-
-As this is a shared external test environment, test execution may be affected by application availability, network conditions, or changes to shared data.
-
-Tests should minimize dependencies on shared state and avoid destructive operations against persistent data.
-
-The product catalog is seeded and read-only for the tests. Expectations are derived from the live data instead of hardcoding product lists, and negative authentication scenarios use synthetic accounts — the seeded demo accounts are never modified.
-
-## AI-Assisted Development
+## AI-assisted development
 
 AI-assisted development tools may be used to support test design, implementation, refactoring, debugging, and technical reviews.
 
@@ -162,11 +99,15 @@ AI-generated changes are subject to review and verification. The goal is to use 
 
 Repository-specific agent instructions are maintained in `AGENTS.md`.
 
-## Project Goals
+## Project goals
 
 This portfolio is intended to demonstrate practical QA Automation engineering skills through realistic test scenarios and maintainable code.
 
 The focus is on **test quality, reliability, clear architecture, and effective automation practices**, rather than maximizing the number of tests or dependencies.
+
+## License
+
+This repository uses the [ISC License](LICENSE).
 
 ---
 

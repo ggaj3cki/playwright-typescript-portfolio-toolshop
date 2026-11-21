@@ -1,4 +1,5 @@
-import type { Locator, Page, Response } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
+import { waitForResponseTo } from './responseWaits';
 
 const cartPath = /^\/carts\/[^/]+$/;
 const quantityPath = /^\/carts\/[^/]+\/product\/quantity$/;
@@ -40,7 +41,7 @@ export class CartPage {
         .getByRole('button', { name: 'Toggle navigation' })
         .click();
     }
-    const responsePromise = this.cartResponse('GET', cartPath);
+    const responsePromise = waitForResponseTo(this.page, 'GET', cartPath);
     await this.cartLink.click();
     await (await responsePromise).finished();
   }
@@ -51,8 +52,8 @@ export class CartPage {
       throw new Error(`Cart quantity is already ${quantity}`);
     }
     const previousTotal = await this.total.innerText();
-    const updateResponse = this.cartResponse('PUT', quantityPath);
-    const refreshResponse = this.cartResponse('GET', cartPath);
+    const updateResponse = waitForResponseTo(this.page, 'PUT', quantityPath);
+    const refreshResponse = waitForResponseTo(this.page, 'GET', cartPath);
     await this.quantity.fill(String(quantity));
     await this.quantity.press('Tab');
     await (await updateResponse).finished();
@@ -67,8 +68,8 @@ export class CartPage {
   }
 
   async removeProduct(): Promise<void> {
-    const removeResponse = this.cartResponse('DELETE', productPath);
-    const refreshResponse = this.cartResponse('GET', cartPath);
+    const removeResponse = waitForResponseTo(this.page, 'DELETE', productPath);
+    const refreshResponse = waitForResponseTo(this.page, 'GET', cartPath);
     await this.removeControl.click();
     await (await removeResponse).finished();
     await (await refreshResponse).finished();
@@ -76,19 +77,8 @@ export class CartPage {
   }
 
   async reload(): Promise<void> {
-    const responsePromise = this.cartResponse('GET', cartPath);
+    const responsePromise = waitForResponseTo(this.page, 'GET', cartPath);
     await this.page.reload();
     await (await responsePromise).finished();
-  }
-
-  private cartResponse(
-    method: 'GET' | 'PUT' | 'DELETE',
-    path: RegExp,
-  ): Promise<Response> {
-    return this.page.waitForResponse(
-      (response) =>
-        response.request().method() === method &&
-        path.test(new URL(response.url()).pathname),
-    );
   }
 }

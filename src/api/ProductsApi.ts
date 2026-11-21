@@ -1,5 +1,4 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
-import { API_BASE_URL } from './apiBaseUrl';
 
 export interface Product {
   id: string;
@@ -38,23 +37,18 @@ export class ProductsApi {
     page: number,
     options: ProductListOptions = {},
   ): Promise<APIResponse> {
-    const url = new URL('/products', API_BASE_URL);
-    url.searchParams.set('page', String(page));
+    const params: Record<string, string | number> = { page };
     for (const [key, value] of Object.entries(options)) {
-      if (value !== undefined) url.searchParams.set(key, value);
+      if (value !== undefined) params[key] = value;
     }
-    return this.request.get(url.toString());
+    return this.request.get('/products', { params });
   }
 
   async getProduct(id: string): Promise<APIResponse> {
-    return this.request.get(
-      new URL(`/products/${encodeURIComponent(id)}`, API_BASE_URL).toString(),
-    );
+    return this.request.get(`/products/${encodeURIComponent(id)}`);
   }
 
   async searchProducts(query: string): Promise<APIResponse> {
-    const url = new URL('/products/search', API_BASE_URL);
-    url.searchParams.set('q', query);
-    return this.request.get(url.toString());
+    return this.request.get('/products/search', { params: { q: query } });
   }
 }

@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
-import { ProductsApi, type ProductsPage } from '../../src/api/ProductsApi';
+import type { ProductsPage } from '../../src/api/ProductsApi';
+import { expect, test } from '../../src/fixtures/apiFixtures';
 
 function expectValidProductsPage(
   productsPage: ProductsPage,
@@ -43,10 +43,8 @@ function expectValidProductsPage(
 }
 
 test('returns distinct paginated product lists @smoke @api', async ({
-  request,
+  productsApi,
 }) => {
-  const productsApi = new ProductsApi(request);
-
   const firstPage =
     await test.step('Browse the first page of products', async () => {
       const response = await productsApi.listProducts(1);

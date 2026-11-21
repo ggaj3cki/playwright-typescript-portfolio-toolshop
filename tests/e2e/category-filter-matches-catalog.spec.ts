@@ -1,24 +1,19 @@
-import { expect, test } from '@playwright/test';
-import {
-  ProductsApi,
-  type Product,
-  type ProductsPage,
-} from '../../src/api/ProductsApi';
+import { type Product, type ProductsPage } from '../../src/api/ProductsApi';
 import { categoryFilterData } from '../../src/data/categoryFilterData';
+import { expect, test } from '../../src/fixtures/index';
 import { HomePage } from '../../src/pages/HomePage';
 
 const MAX_CATALOG_PAGES = 10;
 
 test('shows the catalog products from the selected category @regression @e2e', async ({
   page,
-  request,
+  productsApi,
 }) => {
   const homePage = new HomePage(page);
   const { categoryName } = categoryFilterData;
 
   const { expectedIds, perPage } =
     await test.step('Identify the category products in the unfiltered catalog', async () => {
-      const productsApi = new ProductsApi(request);
       const firstResponse = await productsApi.listProducts(1);
       expect(firstResponse.status()).toBe(200);
       const firstPage = (await firstResponse.json()) as ProductsPage;

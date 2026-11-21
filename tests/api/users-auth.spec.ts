@@ -1,9 +1,5 @@
-import { expect, test } from '@playwright/test';
-import {
-  UsersApi,
-  type CurrentUser,
-  type LoginResponse,
-} from '../../src/api/UsersApi';
+import type { CurrentUser, LoginResponse } from '../../src/api/UsersApi';
+import { expect, test } from '../../src/fixtures/apiFixtures';
 import { invalidAuthToken } from '../../src/data/invalidAuthToken';
 import { createInvalidLoginCredentials } from '../../src/data/invalidLoginCredentials';
 import { validLoginCredentials } from '../../src/data/loginCredentials';
@@ -19,9 +15,8 @@ function expectErrorBody(
 }
 
 test('logs in with valid credentials and reads the current user @smoke @api', async ({
-  request,
+  usersApi,
 }) => {
-  const usersApi = new UsersApi(request);
   const credentials = validLoginCredentials.customer2;
 
   const token = await test.step('Log in as a customer', async () => {
@@ -50,10 +45,8 @@ test('logs in with valid credentials and reads the current user @smoke @api', as
 });
 
 test('rejects login with invalid credentials @regression @api', async ({
-  request,
+  usersApi,
 }) => {
-  const usersApi = new UsersApi(request);
-
   await test.step('Log in with a synthetic account', async () => {
     const response = await usersApi.login(createInvalidLoginCredentials());
     expect(response.status()).toBe(401);
@@ -69,10 +62,8 @@ const unauthenticatedCases = [
 
 for (const authCase of unauthenticatedCases) {
   test(`rejects current user access with ${authCase.name} @regression @api`, async ({
-    request,
+    usersApi,
   }) => {
-    const usersApi = new UsersApi(request);
-
     await test.step('Request the protected customer profile', async () => {
       const response = await usersApi.getCurrentUser(authCase.token);
       expect(response.status()).toBe(401);

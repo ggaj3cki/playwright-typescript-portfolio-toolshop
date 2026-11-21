@@ -1,10 +1,11 @@
-import { expect, test, type APIResponse } from '@playwright/test';
+import type { APIResponse } from '@playwright/test';
 import {
-  ProductsApi,
+  type ProductsApi,
   type Product,
   type ProductsPage,
 } from '../../src/api/ProductsApi';
 import { productSearchData } from '../../src/data/productSearchData';
+import { expect, test } from '../../src/fixtures/apiFixtures';
 
 async function readFirstPage(response: APIResponse): Promise<ProductsPage> {
   expect(response.status()).toBe(200);
@@ -25,10 +26,8 @@ async function sourceProduct(productsApi: ProductsApi): Promise<Product> {
 }
 
 test('finds products by name on the first page @regression @api', async ({
-  request,
+  productsApi,
 }) => {
-  const productsApi = new ProductsApi(request);
-
   await test.step('Search for products by keyword', async () => {
     const page = await readFirstPage(
       await productsApi.searchProducts(productSearchData.keyword),
@@ -45,10 +44,8 @@ test('finds products by name on the first page @regression @api', async ({
 });
 
 test('finds a catalog product by its full name on the first page @regression @api', async ({
-  request,
+  productsApi,
 }) => {
-  const productsApi = new ProductsApi(request);
-
   const source = await test.step('Choose a catalog product', () =>
     sourceProduct(productsApi));
 
@@ -72,10 +69,8 @@ test('finds a catalog product by its full name on the first page @regression @ap
 });
 
 test('returns an empty first page for an unmatched name @regression @api', async ({
-  request,
+  productsApi,
 }) => {
-  const productsApi = new ProductsApi(request);
-
   await test.step('Search for a non-existent product', async () => {
     const page = await readFirstPage(
       await productsApi.searchProducts(productSearchData.noResultsQuery),
@@ -89,10 +84,8 @@ test('returns an empty first page for an unmatched name @regression @api', async
 });
 
 test('filters the first page by a product category @regression @api', async ({
-  request,
+  productsApi,
 }) => {
-  const productsApi = new ProductsApi(request);
-
   const source = await test.step('Choose a catalog product', () =>
     sourceProduct(productsApi));
 
@@ -114,10 +107,8 @@ test('filters the first page by a product category @regression @api', async ({
 });
 
 test('filters the first page by a product brand @regression @api', async ({
-  request,
+  productsApi,
 }) => {
-  const productsApi = new ProductsApi(request);
-
   const source = await test.step('Choose a catalog product', () =>
     sourceProduct(productsApi));
 
@@ -139,10 +130,8 @@ test('filters the first page by a product brand @regression @api', async ({
 });
 
 test('sorts prices across the catalog in both directions @regression @api', async ({
-  request,
+  productsApi,
 }) => {
-  const productsApi = new ProductsApi(request);
-
   const ascending =
     await test.step('See prices from lowest to highest', async () => {
       const page = await readFirstPage(

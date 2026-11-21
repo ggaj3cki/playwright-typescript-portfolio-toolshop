@@ -1,4 +1,5 @@
 import type { Locator, Page, Response } from '@playwright/test';
+import { waitForResponseTo } from './responseWaits';
 
 export class HomePage {
   readonly productNames: Locator;
@@ -18,7 +19,7 @@ export class HomePage {
   }
 
   async goto(): Promise<void> {
-    const responsePromise = this.productsResponse('/products');
+    const responsePromise = waitForResponseTo(this.page, 'QUERY', '/products');
     await this.page.goto('/');
     await this.waitForRenderedProducts(await responsePromise);
   }
@@ -39,13 +40,17 @@ export class HomePage {
 
   async search(query: string): Promise<void> {
     await this.page.getByTestId('search-query').fill(query);
-    const responsePromise = this.productsResponse('/products/search');
+    const responsePromise = waitForResponseTo(
+      this.page,
+      'QUERY',
+      '/products/search',
+    );
     await this.page.getByTestId('search-submit').click();
     await this.waitForRenderedProducts(await responsePromise);
   }
 
   async sortBy(optionLabel: string): Promise<void> {
-    const responsePromise = this.productsResponse('/products');
+    const responsePromise = waitForResponseTo(this.page, 'QUERY', '/products');
     await this.sortControl.selectOption({ label: optionLabel });
     await this.waitForRenderedProducts(await responsePromise);
   }
@@ -55,27 +60,19 @@ export class HomePage {
   }
 
   async filterByCategory(categoryName: string): Promise<void> {
-    const responsePromise = this.productsResponse('/products');
+    const responsePromise = waitForResponseTo(this.page, 'QUERY', '/products');
     await this.categoryCheckbox(categoryName).check();
     await this.waitForRenderedProducts(await responsePromise);
   }
 
   async removeCategoryFilter(categoryName: string): Promise<void> {
-    const responsePromise = this.productsResponse('/products');
+    const responsePromise = waitForResponseTo(this.page, 'QUERY', '/products');
     await this.categoryCheckbox(categoryName).uncheck();
     await this.waitForRenderedProducts(await responsePromise);
   }
 
   async openFirstProduct(): Promise<void> {
     await this.productNames.first().click();
-  }
-
-  private productsResponse(path: string): Promise<Response> {
-    return this.page.waitForResponse(
-      (response) =>
-        response.request().method() === 'QUERY' &&
-        new URL(response.url()).pathname === path,
-    );
   }
 
   private async waitForRenderedProducts(response: Response): Promise<void> {
