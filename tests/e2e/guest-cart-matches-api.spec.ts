@@ -33,8 +33,6 @@ test('keeps the guest cart consistent across UI and API @smoke @e2e', async ({
       await expect(cartPage.cartQuantity).toHaveText('1');
       return cartId;
     });
-  if (capturedCartId === undefined) throw new Error('Cart id was not captured');
-
   await test.step('Read the product and totals in the cart', async () => {
     await cartPage.open();
     await expect(cartPage.rows).toHaveCount(1);

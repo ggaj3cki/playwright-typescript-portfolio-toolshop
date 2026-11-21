@@ -58,7 +58,7 @@ Cart UI tests derive expected totals from a product's displayed unit price and q
 - [`apiFixtures.ts`](../src/fixtures/apiFixtures.ts) creates a request context with a shared API base URL and JSON accept header, so clients can use relative paths and quantity validation receives JSON errors.
 - The `cart` fixture in [`apiFixtures.ts`](../src/fixtures/apiFixtures.ts) checks creation and deletion; its teardown removes each API test's guest cart.
 - The E2E cart test registers its cart created through the UI for cleanup in [`guest-cart-matches-api.spec.ts`](../tests/e2e/guest-cart-matches-api.spec.ts), so teardown can delete it even after a later assertion fails.
-- [`catalogFixtures.ts`](../src/fixtures/catalogFixtures.ts) selects a product through the UI and checks availability before cart actions; this depends on the chosen listed product being in stock.
+- [`catalogFixtures.ts`](../src/fixtures/catalogFixtures.ts) selects the first available listed product by skipping cards marked out of stock, still checks that its add button is enabled on the details page, and fails explicitly when no listed product is available.
 - [`category-filter-matches-catalog.spec.ts`](../tests/e2e/category-filter-matches-catalog.spec.ts) builds its expected product IDs from the unfiltered API catalog, independently of the filtered UI response.
 - First-page checks in [`products-search-filter.spec.ts`](../tests/api/products-search-filter.spec.ts) state when recall can be proved; category and brand checks otherwise verify only precision.
 - [`sort-products.spec.ts`](../tests/ui/sort-products.spec.ts) and [`price.ts`](../src/utils/price.ts) compare displayed money as integer cents to avoid floating-point display comparisons.
@@ -113,7 +113,7 @@ The [Playwright configuration](../playwright.config.ts) uses list output and gen
 - Firefox and WebKit are configured, but this document reports no execution results for them.
 - UI search, sort, and category comparisons focus on the first displayed page; there is no UI pagination test.
 - The cart API response has no line totals, so monetary totals are checked in the UI using product prices.
-- Catalog selection for cart UI tests expects the chosen listed product to be in stock; shared catalog changes can prevent that precondition.
+- If no product on the listed page is available, cart UI and E2E tests fail on an explicit precondition; shared catalog changes can still cause that.
 - Shared accounts, catalog state, and a possible security challenge can block live verification independently of test logic.
 
 ## Last verified

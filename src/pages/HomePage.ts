@@ -75,6 +75,19 @@ export class HomePage {
     await this.productNames.first().click();
   }
 
+  async openFirstAvailableProduct(): Promise<void> {
+    const cards = this.page.getByTestId(/^product-[0-9A-Z]{26}$/);
+    const availableCards = cards.filter({
+      hasNot: this.page.getByTestId('out-of-stock'),
+    });
+    if ((await availableCards.count()) === 0) {
+      throw new Error(
+        `No available product among the ${await cards.count()} listed products`,
+      );
+    }
+    await availableCards.first().getByTestId('product-name').click();
+  }
+
   private async waitForRenderedProducts(response: Response): Promise<void> {
     const result = (await response.json()) as { data: { id: string }[] };
     await this.page.waitForFunction(

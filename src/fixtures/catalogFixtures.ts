@@ -25,12 +25,12 @@ export const test = base.extend<CatalogFixtures>({
       await homePage.goto();
       if (options?.searchTerm !== undefined)
         await homePage.search(options.searchTerm);
-      await homePage.openFirstProduct();
+      await homePage.openFirstAvailableProduct();
       await expect(detailsPage.name).toBeVisible();
       await expect(detailsPage.unitPrice).toBeVisible();
       await expect(
         detailsPage.addToCartButton,
-        'first listed product is out of stock',
+        'selected product is out of stock',
       ).toBeEnabled();
       await expect(detailsPage.quantity).toHaveValue('1');
       return {
