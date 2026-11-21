@@ -1,1 +1,9 @@
+# Store and check out text files with LF on every platform (Windows, Linux, macOS, CI).
 * text=auto eol=lf
+
+# Never convert binary files (for example a report screenshot added later).
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
