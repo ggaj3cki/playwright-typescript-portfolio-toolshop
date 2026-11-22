@@ -6,8 +6,9 @@ const apiTests = '**/api/**';
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
+  // Retries are intentionally not configured (AGENTS.md): fix the root cause of flakiness.
   forbidOnly: !!process.env.CI,
-  // AGENTS.md: fix flaky tests instead of retrying them.
+  // One worker on CI; Playwright's default locally.
   workers: process.env.CI ? 1 : undefined,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {

@@ -39,8 +39,8 @@ tests/api/       API endpoint specs
 tests/ui/        Browser interaction specs
 tests/e2e/       UI and API comparison specs
 src/api/         API request clients
-src/pages/       Page Objects and response-based waits
-src/fixtures/    API, catalog, and merged E2E fixtures
+src/pages/       Page Objects, response waits, and response mocks
+src/fixtures/    API fixtures, catalog fixtures built on them, and the E2E entry point
 src/data/        Test inputs and data builders
 src/utils/       Pure helpers, including price conversion
 docs/            Public test coverage documentation
@@ -83,7 +83,7 @@ ESLint prevents focused tests, arbitrary time waits, `networkidle`, raw locators
 
 ## Continuous integration
 
-The [`code-checks` workflow](.github/workflows/code-checks.yml) runs lint, type checking, and formatting checks on pushes and pull requests to `main` or `master`. Browser tests are excluded because the shared public site can present a security challenge to hosted runners. The [API workflow](.github/workflows/api-tests.yml) is manual and experimental; its GitHub execution result is not recorded in this repository.
+The [`code-checks` workflow](.github/workflows/code-checks.yml) runs lint, type checking, and formatting checks on pushes and pull requests to `main` or `master`. Browser tests are excluded because the shared public site can present a security challenge to hosted runners.
 
 ## Test environment
 

@@ -17,9 +17,9 @@ API: https://api.practicesoftwaretesting.com — the stable instance without the
 
 ## Project layout
 - `tests/ui/`, `tests/api/`, `tests/e2e/` — one layer per spec, never mixed
-- `src/pages/` — Page Objects and `responseWaits.ts` (shared wait for a response by method and path); UI specs never use raw locators
+- `src/pages/` — Page Objects, `responseWaits.ts` (shared wait for a response by method and path) and `responseMocks.ts` (route helper for deterministic states); UI specs never use raw locators
 - `src/api/` — API clients built on `APIRequestContext`; they use relative paths, and the base URL and `Accept: application/json` come from the fixture context
-- `src/fixtures/` — `apiFixtures.ts` (API context, clients, `cart`, `trackCartForCleanup`; used by `tests/api/`), `catalogFixtures.ts` (UI product fixtures; used by `tests/ui/`), `index.ts` (merges both; used by `tests/e2e/`)
+- `src/fixtures/` — `apiFixtures.ts` (API context, clients, `cart`, `trackCartForCleanup`; used by `tests/api/`), `catalogFixtures.ts` (UI product fixtures, built on the API fixtures so UI carts can be cleaned up; used by `tests/ui/`), `index.ts` (re-exports `catalogFixtures`; used by `tests/e2e/`)
 - `src/data/` — test data builders; no hardcoded data in specs
 - `src/utils/` — pure, UI-agnostic helpers (e.g. price parsing); no locators, no Playwright objects
 - No `.env` is required today; `.env.example` is a placeholder for future non-secret settings (a real `.env` is gitignored)
@@ -32,7 +32,8 @@ API: https://api.practicesoftwaretesting.com — the stable instance without the
 - `test.step()` names describe business actions ("Add product to cart"), not clicks.
 - Tags: `@smoke`, `@regression`, `@api`, `@ui`, `@e2e`
 - ESLint enforces the project rules: no `waitForTimeout`, `networkidle` or `.only`; no raw locators in UI/E2E specs; layer import boundaries (UI specs use `catalogFixtures`, API specs use `apiFixtures`, E2E specs use `index`); `src/utils` free of Playwright. Fix the cause instead of disabling a rule.
-- Guest carts: API and E2E tests delete the carts they create through the `cart` and `trackCartForCleanup` fixtures. The UI cart specs currently leave their guest carts (known limitation).
+- Guest carts: API, E2E and UI cart tests delete the guest carts they create through fixture teardown (`cart` and `trackCartForCleanup`).
+- `page.route` is allowed in UI specs only to make a state deterministic; mock data lives in `src/data` and the route helper in `src/pages/responseMocks.ts`.
 - Line endings: LF; enforced by `.gitattributes`, `.editorconfig` and Prettier (`endOfLine: lf`).
 
 ## Don't

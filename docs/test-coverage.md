@@ -12,7 +12,7 @@ This page describes assertions present in the repository. The counts below come 
 | --- | --- | --- | --- |
 | API | [`tests/api/`](../tests/api/) | `api`, no browser | [`src/api/`](../src/api/) clients and [`apiFixtures.ts`](../src/fixtures/apiFixtures.ts) |
 | UI | [`tests/ui/`](../tests/ui/) | `chromium` | [`src/pages/`](../src/pages/) Page Objects and [`catalogFixtures.ts`](../src/fixtures/catalogFixtures.ts) |
-| E2E | [`tests/e2e/`](../tests/e2e/) | `chromium` | [`src/fixtures/index.ts`](../src/fixtures/index.ts) merges API and catalog fixtures |
+| E2E | [`tests/e2e/`](../tests/e2e/) | `chromium` | [`src/fixtures/index.ts`](../src/fixtures/index.ts) re-exports the catalog fixtures, which build on the API fixtures |
 
 Firefox and WebKit projects are also configured for browser specs. Their execution results were not established for this document.
 
@@ -106,8 +106,6 @@ The [Playwright configuration](../playwright.config.ts) uses list output and gen
 ## Continuous integration
 
 [`code-checks.yml`](../.github/workflows/code-checks.yml) runs `npm run lint`, `npm run typecheck`, and `npm run format:check` on pushes and pull requests to `main` or `master`. Browser tests are not in that workflow because the public site may challenge hosted runners.
-
-[`api-tests.yml`](../.github/workflows/api-tests.yml) is a manual, experimental API workflow. Its result on GitHub is not verifiable from repository files and is not claimed here.
 
 ## Known limitations and not covered
 

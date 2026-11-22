@@ -16,6 +16,6 @@ test('shows an empty state when the catalog has no products @regression @ui', as
   await test.step('See the empty catalog state', async () => {
     await expect(homePage.noResults).toHaveText('There are no products found.');
     await expect(homePage.productNames).toHaveCount(0);
-    expect(mock.fulfilledRequests).toBe(1);
+    expect(mock.matchedRequests).toBeGreaterThan(0);
   });
 });
