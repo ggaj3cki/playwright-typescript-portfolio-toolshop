@@ -27,9 +27,10 @@ Every test has a layer tag (`@api`, `@ui`, or `@e2e`) and a purpose tag (`@smoke
 | API | [`products-list.spec.ts`](../tests/api/products-list.spec.ts) | 1 | `@smoke @api` | First two pages, pagination metadata, product fields, distinct IDs | Does not traverse every catalog page |
 | API | [`products-search-filter.spec.ts`](../tests/api/products-search-filter.spec.ts) | 6 | `@regression @api` | Search precision and full-name recall, empty search, category and brand filters, price order | Search and filter assertions inspect page one; filter recall is conditional on the whole set fitting there; sorting uses page-one extremes |
 | API | [`users-auth.spec.ts`](../tests/api/users-auth.spec.ts) | 4 | `@smoke @api`; `@regression @api` | Successful customer login/profile, synthetic invalid login, missing and invalid authorization | Does not change a seeded account |
-| UI | [`add-to-cart.spec.ts`](../tests/ui/add-to-cart.spec.ts) | 1 | `@smoke @ui` | Add confirmation, cart badge, product, quantity, and displayed totals | Does not delete the guest cart resource or complete checkout |
+| UI | [`add-to-cart.spec.ts`](../tests/ui/add-to-cart.spec.ts) | 1 | `@smoke @ui` | Add confirmation, cart badge, product, quantity, and displayed totals | Does not complete checkout |
 | UI | [`admin-login.spec.ts`](../tests/ui/admin-login.spec.ts) | 1 | `@smoke @ui` | Admin login reaches the dashboard | Does not exercise other authenticated UI flows |
-| UI | [`cart-management.spec.ts`](../tests/ui/cart-management.spec.ts) | 2 | `@regression @ui` | Quantity and totals across reload; removal and empty cart across reload | Does not delete the guest cart resource |
+| UI | [`cart-management.spec.ts`](../tests/ui/cart-management.spec.ts) | 2 | `@regression @ui` | Quantity and totals across reload; removal and empty cart across reload | Removal test removes an item, not the cart; fixture deletes the cart in teardown |
+| UI | [`empty-catalog.spec.ts`](../tests/ui/empty-catalog.spec.ts) | 1 | `@regression @ui` | Empty catalog message and zero product cards from a mocked response | Does not validate the live catalog API |
 | UI | [`filter-products-by-category.spec.ts`](../tests/ui/filter-products-by-category.spec.ts) | 2 | `@regression @ui` | Category selection, product detail badge, clearing the filter | Does not compare the full category with the API |
 | UI | [`invalid-login.spec.ts`](../tests/ui/invalid-login.spec.ts) | 1 | `@regression @ui` | Synthetic invalid login remains on the form and shows an error | Does not exercise seeded account lockout |
 | UI | [`login-validation.spec.ts`](../tests/ui/login-validation.spec.ts) | 5 | `@regression @ui` | Required fields, email format, and length limits | Does not submit a valid login |
@@ -38,7 +39,7 @@ Every test has a layer tag (`@api`, `@ui`, or `@e2e`) and a purpose tag (`@smoke
 | E2E | [`category-filter-matches-catalog.spec.ts`](../tests/e2e/category-filter-matches-catalog.spec.ts) | 1 | `@regression @e2e` | UI category IDs against independently read API catalog data | Full recall only if results fit on one page; catalog read capped at 10 pages |
 | E2E | [`guest-cart-matches-api.spec.ts`](../tests/e2e/guest-cart-matches-api.spec.ts) | 1 | `@smoke @e2e` | UI product, cart totals, cart item, and product API agree | Does not place an order or derive totals from the cart API |
 
-**Totals:** 21 API tests in 5 files, 16 UI tests in 8 files, and 2 E2E tests in 2 files: 39 tests across the `api` and `chromium` projects.
+**Totals:** 21 API tests in 5 files, 17 UI tests in 9 files, and 2 E2E tests in 2 files: 40 tests across the `api` and `chromium` projects.
 
 Counts are per project: selecting more browser projects discovers the browser specs in each selected browser.
 
@@ -57,12 +58,14 @@ Cart UI tests derive expected totals from a product's displayed unit price and q
 - The dedicated [`api` project](../playwright.config.ts) runs endpoint specs once without a browser, while browser projects exclude them.
 - [`apiFixtures.ts`](../src/fixtures/apiFixtures.ts) creates a request context with a shared API base URL and JSON accept header, so clients can use relative paths and quantity validation receives JSON errors.
 - The `cart` fixture in [`apiFixtures.ts`](../src/fixtures/apiFixtures.ts) checks creation and deletion; its teardown removes each API test's guest cart.
+- UI cart cleanup runs through the API in fixture teardown after each test.
 - The E2E cart test registers its cart created through the UI for cleanup in [`guest-cart-matches-api.spec.ts`](../tests/e2e/guest-cart-matches-api.spec.ts), so teardown can delete it even after a later assertion fails.
 - [`catalogFixtures.ts`](../src/fixtures/catalogFixtures.ts) selects the first available listed product by skipping cards marked out of stock, still checks that its add button is enabled on the details page, and fails explicitly when no listed product is available.
 - [`category-filter-matches-catalog.spec.ts`](../tests/e2e/category-filter-matches-catalog.spec.ts) builds its expected product IDs from the unfiltered API catalog, independently of the filtered UI response.
 - First-page checks in [`products-search-filter.spec.ts`](../tests/api/products-search-filter.spec.ts) state when recall can be proved; category and brand checks otherwise verify only precision.
 - [`sort-products.spec.ts`](../tests/ui/sort-products.spec.ts) and [`price.ts`](../src/utils/price.ts) compare displayed money as integer cents to avoid floating-point display comparisons.
 - [`responseWaits.ts`](../src/pages/responseWaits.ts) synchronizes Page Objects with matching HTTP methods and URL paths instead of fixed delays.
+- [`empty-catalog.spec.ts`](../tests/ui/empty-catalog.spec.ts) uses `page.route` to replace one catalog response, making the UI's empty state deterministic without changing the real API.
 - Temporary, uncommitted fault injection has been used during development to check that assertions and cleanup detect failures; it is not part of the committed suite.
 
 ## Test data and environment constraints
@@ -74,10 +77,10 @@ The public instance is shared. Tests read seeded product data and derive product
 | Seeded products | API, UI, and E2E catalog tests | Read only; expectations come from current catalog data |
 | API guest carts | Eight cart endpoint tests | Fixture deletes each cart in teardown |
 | E2E guest cart | Guest cart comparison test | Registered for API deletion in fixture teardown |
-| UI guest carts | Add-to-cart and cart-management tests | Cart resources are not deleted by these specs |
+| UI guest carts | Add-to-cart and cart-management tests | Registered for API deletion in fixture teardown |
 | Synthetic login identities | Negative API and UI login tests | No seeded account receives an invalid login attempt |
 
-The API cart specs create and delete one guest cart per test through the `cart` fixture. The guest-cart E2E spec creates a cart in the UI and registers it for API deletion. The UI add-to-cart and cart-management specs create guest carts without deleting the cart resources; the removal test removes an item, not the cart itself. No test creates a checkout or order.
+The API cart specs create and delete one guest cart per test through the `cart` fixture. The guest-cart E2E spec creates a cart in the UI and registers it for API deletion. The UI add-to-cart and cart-management specs also register their guest carts for API deletion in fixture teardown; the removal test removes an item, not the cart itself. No test creates a checkout or order.
 
 The current tests do not require a `.env` file. The [environment template](../.env.example) contains no required settings. The only `process.env` usage in the inspected source and test configuration is for CI behavior in [`playwright.config.ts`](../playwright.config.ts).
 
@@ -118,4 +121,4 @@ The [Playwright configuration](../playwright.config.ts) uses list output and gen
 
 ## Last verified
 
-On 2026-11-21, test counts and titles were read with `npx playwright test --list --project=api` (21) and `npx playwright test --list --project=chromium` (18). No live tests were run for this documentation update.
+On 2026-11-22, test counts and titles were read with `npx playwright test --list --project=api` (21) and `npx playwright test --list --project=chromium` (19); `npx playwright test --list` found 78 across all configured projects.

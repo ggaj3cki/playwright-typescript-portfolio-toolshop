@@ -89,7 +89,7 @@ The [`code-checks` workflow](.github/workflows/code-checks.yml) runs lint, type 
 
 The suite targets the shared public Toolshop instance. The seeded product catalog is treated as read-only, and tests derive expected products from catalog responses. Negative authentication uses synthetic accounts; seeded demo accounts are never modified. A public demo account may return HTTP 423 or have changed credentials because other users share the instance; that is an environment limitation, not evidence of a product defect.
 
-API cart specs create and delete their own guest carts. The E2E guest cart spec registers its cart created through the UI for API cleanup. UI cart specs create guest carts but do not delete the cart resource. No test places an order or completes checkout.
+API cart specs create and delete their own guest carts. The E2E and UI cart specs register their carts created through the UI for API cleanup in fixture teardown. No test places an order or completes checkout.
 
 ## AI-assisted development
 

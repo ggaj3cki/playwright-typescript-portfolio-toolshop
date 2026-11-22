@@ -27,7 +27,7 @@ API: https://api.practicesoftwaretesting.com — the stable instance without the
 ## Conventions
 - Locator priority: `getByRole` > `getByTestId` > `getByLabel`. No CSS chains or XPath.
 - Toolshop exposes `data-test` attributes; keep `testIdAttribute: 'data-test'` in `playwright.config.ts`.
-- Auth: log in via API in setup and reuse `storageState`. UI login only in login tests.
+- Auth: if an authenticated UI flow is added, log in via the API in setup and reuse `storageState` (no such flow exists yet). UI login only in login tests.
 - Each test creates the data it needs; no dependence on other tests, order, or pre-existing records.
 - `test.step()` names describe business actions ("Add product to cart"), not clicks.
 - Tags: `@smoke`, `@regression`, `@api`, `@ui`, `@e2e`
@@ -53,7 +53,7 @@ API: https://api.practicesoftwaretesting.com — the stable instance without the
 - Auth API: POST /users/login returns access_token, token_type: bearer and expires_in: 300; a failed login returns 401 with an error field, while GET /users/me without or with an invalid token returns 401 with a message field (different keys). No throttling signals were observed.
 - Seeded demo accounts are public and shared; a login can fail with 423 (locked) or a changed password because of other users. The credentials are public and the lockout was also observed in manual testing: treat a 423 as an environment limitation, not a product defect. Keep logins to the minimum (one per run) and never send wrong passwords for seeded accounts.
 - Cart API: add and update quantity validation depends on the `Accept` header — with `Accept: application/json` an out-of-range quantity (`0`, `100`, `-1`) returns 422 with `errors.quantity`; without it the API answers 302 with an HTML page. `PUT /carts/{id}/product/quantity` replaces the quantity and returns `result` (Swagger documents `success`). `DELETE /carts/{id}/product/{productId}` returns 204 (also for a product that is not in the cart); `DELETE /carts/{id}` returns 204. A cart read returns no line totals. The API fixture context sends `Accept: application/json` on every request; `APIRequestContext` follows the 302 redirect, so a request without the header ends on the redirect target (a 404 in a mutation run) instead of the 422 validation error.
-- Product availability on the shared instance changes. `chooseAvailableProduct` takes the first listed product and fails with "first listed product is out of stock" when its add button is disabled; this was observed once (the cart UI and E2E tests passed on a rerun). Treat it as an environment limitation; do not mask it.
+- Product availability on the shared instance changes (the first listed product was once out of stock). Out-of-stock cards carry `data-test="out-of-stock"`, which matches `in_stock: false` in the API and a disabled add button on the details page. `chooseAvailableProduct` skips such cards, still expects an enabled add button on the details page, and fails with "No available product among the N listed products" when none is available. Treat that failure as an environment limitation; do not mask it.
 
 ## Done means
 - Specs touched by the change pass locally; new tests pass with `--repeat-each=3`.

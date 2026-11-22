@@ -1,4 +1,4 @@
-import { expect, test as base } from '@playwright/test';
+import { expect, test as base } from './apiFixtures';
 import { CartPage } from '../pages/CartPage';
 import { HomePage } from '../pages/HomePage';
 import { ProductDetailsPage } from '../pages/ProductDetailsPage';
@@ -43,12 +43,17 @@ export const test = base.extend<CatalogFixtures>({
     });
   },
 
-  addAvailableProductToCart: async ({ page, chooseAvailableProduct }, use) => {
+  addAvailableProductToCart: async (
+    { page, chooseAvailableProduct, trackCartForCleanup },
+    use,
+  ) => {
     await use(async () => {
       const product = await chooseAvailableProduct();
       const detailsPage = new ProductDetailsPage(page);
       const cartPage = new CartPage(page);
-      await detailsPage.addToCart();
+      const cartId = await detailsPage.addToCart();
+      // API access in UI runs is only for teardown cleanup; UI specs use Page Objects for assertions.
+      trackCartForCleanup(cartId);
       await expect(cartPage.cartQuantity).toHaveText('1');
       return product;
     });

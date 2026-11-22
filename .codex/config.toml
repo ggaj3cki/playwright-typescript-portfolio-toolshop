@@ -6,4 +6,4 @@ sandbox_mode = "workspace-write"
 # Node.js/npm must be installed before the MCP server can start.
 [mcp_servers.playwright]
 command = "npx"
-args = ["-y", "@playwright/mcp@latest", "--isolated"]
+args = ["-y", "@playwright/mcp@0.0.86", "--isolated"]

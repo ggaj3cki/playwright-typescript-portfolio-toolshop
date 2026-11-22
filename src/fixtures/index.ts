@@ -1,6 +1,2 @@
-import { mergeTests } from '@playwright/test';
-import { test as apiTest } from './apiFixtures';
-import { test as catalogTest } from './catalogFixtures';
-
-export const test = mergeTests(apiTest, catalogTest);
-export { expect } from '@playwright/test';
+// E2E entry point includes API and catalog fixtures.
+export { expect, test } from './catalogFixtures';

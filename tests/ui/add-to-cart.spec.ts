@@ -6,6 +6,7 @@ import { cartPriceTextPattern, parsePriceInCents } from '../../src/utils/price';
 test('adds a catalog product to the guest cart @smoke @ui', async ({
   page,
   chooseAvailableProduct,
+  trackCartForCleanup,
 }) => {
   const detailsPage = new ProductDetailsPage(page);
   const cartPage = new CartPage(page);
@@ -14,7 +15,8 @@ test('adds a catalog product to the guest cart @smoke @ui', async ({
     chooseAvailableProduct());
 
   await test.step('Add the product to the cart', async () => {
-    await detailsPage.addToCart();
+    const cartId = await detailsPage.addToCart();
+    trackCartForCleanup(cartId);
   });
 
   await test.step('See the cart confirmation and item count', async () => {
